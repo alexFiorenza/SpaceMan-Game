@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     public GameState currentGameState = GameState.menu;
     public static GameManager sharedInstance; //Un singletone
     PlayerController controller;
+    public int collectedObject = 0;
     private void Awake()
     {
         if (sharedInstance == null)
@@ -32,9 +33,9 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.S) && currentGameState!=GameState.inGame)
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
-            StartGame();
+            SetGameState(GameState.menu);
         }
     }
 
@@ -42,7 +43,11 @@ public class GameManager : MonoBehaviour
     //Empezar el juego en el menu
     public void StartGame()
     {
-        SetGameState(GameState.inGame);
+        if (currentGameState == GameState.menu || currentGameState==GameState.gameOver)
+        {
+            SetGameState(GameState.inGame);
+        }
+        
     }
 
     //Volver al menu
@@ -61,16 +66,28 @@ public class GameManager : MonoBehaviour
     {
         if (newGameState == GameState.menu)
         {
-            
+            MenuManager.sharedInstance.ShowMainMenu();
+            Cursor.visible = true;
         }else if (newGameState == GameState.inGame)
         {
+            LevelManager.sharedInstance.RemoveAllLevelBlocks();
+            LevelManager.sharedInstance.GenerateInitialBlocks();
             controller.StartGame();
+            MenuManager.sharedInstance.HideMainMenu();
+            Cursor.visible = false;
         }
+
         else
         {
-            
+            MenuManager.sharedInstance.ShowMainMenu();  
         }
 
         this.currentGameState = newGameState;
     }
+
+    public void CollectObject(Collectable collectable)
+    {
+        collectedObject += collectable.value;
+    }
+   
 }

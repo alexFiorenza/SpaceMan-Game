@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float jumpforce = 6f;
+    public const float JUMP_FORCE = 8f;
     private Rigidbody2D rigidBody;
     public LayerMask groundMask; //Creamos una variable LayerMask que referiense a la capa del suelo
     private Animator anim;
@@ -13,7 +13,14 @@ public class PlayerController : MonoBehaviour
     public float runningSpeed = 2.0f;
     private SpriteRenderer spriteRender;
     Vector3 startPosition;
+    private int healthPoints, manaPoints;
+    public const int INITIAL_HEALTH = 100, INITIAL_MANA = 15,
+                    MAX_HEALTH = 200, MAX_MANA = 30,
+                    MIN_HEALTH = 0, MIN_MANA = 0;
 
+    public const int SUPERJUMP_COST = 15;
+    public const float SUPERJUMP_FORCE = 1.5F;
+    public bool hasUsedJumpForce;
 
     private void Awake()
     {
@@ -34,18 +41,28 @@ public class PlayerController : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
             {
-                Jump();
+                Jump(false);
+            }
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                Jump(true);
             }
         }
         
         anim.SetBool(STATE_ON_THE_GROUND, IsTouchingTheGround());
     }
 
-    void Jump()
+    void Jump(bool superJump)
     {
+        float jumpForceFactor = JUMP_FORCE;
+        if (superJump && manaPoints>=SUPERJUMP_COST)
+        {
+            manaPoints -= SUPERJUMP_COST;
+            jumpForceFactor *= SUPERJUMP_FORCE;
+        }
         if (IsTouchingTheGround())
         {
-            rigidBody.AddForce(Vector2.up * jumpforce, ForceMode2D.Impulse);    
+            rigidBody.AddForce(Vector2.up * jumpForceFactor, ForceMode2D.Impulse);    
         }
             
     }
@@ -68,8 +85,6 @@ public class PlayerController : MonoBehaviour
             }
             
         }
-        
-
     }
 
 
@@ -94,12 +109,42 @@ public class PlayerController : MonoBehaviour
     {
         anim.SetBool(STATE_ALIVE, true);
         anim.SetBool(STATE_ON_THE_GROUND, true);
-        Invoke("RestartPosition", 0.4f);   
+        Invoke("RestartPosition", 0.4f);
+        healthPoints = INITIAL_HEALTH;
+        manaPoints = INITIAL_MANA;
     }
 
     void RestartPosition()
     {
         this.transform.position = startPosition;
         rigidBody.velocity = Vector2.zero;
+        GameObject mainCamera = GameObject.Find("Main Camera");
+        mainCamera.GetComponent<CameraFollow>().ResetCameraPosition();
+    }
+
+    public void CollectHealth(int points)
+    {
+        this.healthPoints += points;
+        if (healthPoints >= MAX_HEALTH)
+        {
+            healthPoints = MAX_HEALTH;
+        }
+    }
+    public void CollectMana(int points)
+    {
+        this.manaPoints += points;
+        if (manaPoints >= MAX_MANA)
+        {
+            manaPoints = MAX_MANA;
+        }
+    }
+
+    public int GetHealth()
+    {
+        return healthPoints;
+    }
+    public int GetMana()
+    {
+        return manaPoints;
     }
 }
