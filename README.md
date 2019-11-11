@@ -1,4 +1,4 @@
 # SpaceMan-Game
  A 2D game developed in Unity 
 Screenshots:
-[![Image from Gyazo](https://i.gyazo.com/8b56475cf50d498ea7b0472eef473fae.png)](https://gyazo.com/8b56475cf50d498ea7b0472eef473fae)
+[![Image from Gyazo](https://i.gyazo.com/a31d3a0e53cfb03fcf194a81cf91aa0a.png)](https://gyazo.com/a31d3a0e53cfb03fcf194a81cf91aa0a)
