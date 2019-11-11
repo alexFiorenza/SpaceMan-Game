@@ -7,6 +7,7 @@ public class Enemy : MonoBehaviour
     public float runningSpeed = 1.5f;
 
     Rigidbody2D r_body;
+    public int enemyDamage = 10;
     public bool facingRight=false;
     private Vector3 startPosition;
 
@@ -19,7 +20,7 @@ public class Enemy : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        this.transform.position = startPosition;
+        
     }
 
     private void FixedUpdate()
@@ -43,5 +44,24 @@ public class Enemy : MonoBehaviour
         {
             r_body.velocity = new Vector2(currentRunningSpeed, r_body.velocity.y);
         }
+        else if (GameManager.sharedInstance.currentGameState == GameState.gameOver)
+        {
+            r_body.velocity = Vector3.zero;
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "Coin")
+        {
+            return;
+        }
+        if (collision.tag == "Player")
+        {
+            collision.gameObject.GetComponent<PlayerController>().CollectHealth(-enemyDamage);
+            return;
+        }
+        //Si llegamos aqui, no chocamos ni con monedas,ni con players
+        facingRight = !facingRight;
     }
 }

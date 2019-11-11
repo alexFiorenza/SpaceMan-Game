@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     public float runningSpeed = 2.0f;
     private SpriteRenderer spriteRender;
     Vector3 startPosition;
+    [SerializeField] //A pesar de que sea una variable privado con esto la podemos ver en el editor de unity
     private int healthPoints, manaPoints;
     public const int INITIAL_HEALTH = 100, INITIAL_MANA = 15,
                     MAX_HEALTH = 200, MAX_MANA = 30,
@@ -20,13 +21,13 @@ public class PlayerController : MonoBehaviour
 
     public const int SUPERJUMP_COST = 15;
     public const float SUPERJUMP_FORCE = 1.5F;
-    public bool hasUsedJumpForce;
 
     private void Awake()
     {
         rigidBody = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         spriteRender = GetComponent<SpriteRenderer>();
+        healthPoints = 50;
     }
     // Start is called before the first frame update
     void Start()
@@ -48,8 +49,11 @@ public class PlayerController : MonoBehaviour
                 Jump(true);
             }
         }
-        
         anim.SetBool(STATE_ON_THE_GROUND, IsTouchingTheGround());
+        if (healthPoints <= 0)
+        {
+            Die();
+        }
     }
 
     void Jump(bool superJump)
@@ -62,7 +66,8 @@ public class PlayerController : MonoBehaviour
         }
         if (IsTouchingTheGround())
         {
-            rigidBody.AddForce(Vector2.up * jumpForceFactor, ForceMode2D.Impulse);    
+            rigidBody.AddForce(Vector2.up * jumpForceFactor, ForceMode2D.Impulse);
+            GetComponent<AudioSource>().Play();
         }
             
     }
@@ -103,6 +108,7 @@ public class PlayerController : MonoBehaviour
     public void Die()
     {
         this.anim.SetBool(STATE_ALIVE, false);
+        GameManager.sharedInstance.GameOver();
     }
 
     public void StartGame()

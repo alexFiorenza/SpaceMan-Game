@@ -11,6 +11,7 @@ public enum BarType
 
 public class PlayerBar : MonoBehaviour
 {
+    
     public Slider slider;
     public BarType type;
     GameObject player;
